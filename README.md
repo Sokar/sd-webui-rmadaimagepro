@@ -1,1 +1,1 @@
-# sd-webui-rmadaimagepro
+# rMadaImagePro for Auto1111 webui

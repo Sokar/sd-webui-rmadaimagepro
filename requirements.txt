@@ -1,0 +1,6 @@
+Pillow==9.5.0
+PyWavelets==1.4.1
+omegaconf
+numpy
+langdetect
+transformers
