@@ -151,30 +151,35 @@ class RmadaUPS(scripts.Script):
                 
                 with gr.Group():
                     with gr.Row():
-                        RMADA_lora_1_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_1_check', self.config.get('RMADA_lora_1_check', True)))
-                        RMADA_lora_1 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 1",interactive=True, value=self.config.get('RMADA_lora_1', 'None'))
+                        RMADA_lora_1_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_1_check', self.config.get('RMADA_lora_1_check', False)))
+                        RMADA_lora_1 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 1",interactive=True, value=self.config.get('RMADA_lora_1', 'RMSDXL_Enhance'))
                         create_refresh_button(RMADA_lora_1, lora.list_available_loras, lambda: {"choices": available_loras_list},"refresh_checkpoint_Z")
                         RMADA_lora_1_weight = gr.Slider(minimum=-5, maximum=5, step=0.1, label="Weight", value=self.config.get('RMADA_lora_1_weight', 0))
+                        RMADA_lora_1_text = gr.Textbox(label="Trigger",value=self.config.get('RMADA_lora_1_text', ""))
                     with gr.Row():
-                        RMADA_lora_2_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_2_check', self.config.get('RMADA_lora_2_check', True)))
-                        RMADA_lora_2 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 1",interactive=True, value=self.config.get('RMADA_lora_2', 'None'))
+                        RMADA_lora_2_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_2_check', self.config.get('RMADA_lora_2_check', False)))
+                        RMADA_lora_2 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 2",interactive=True, value=self.config.get('RMADA_lora_2', 'RMSDXL_Creative'))
                         create_refresh_button(RMADA_lora_2, lora.list_available_loras, lambda: {"choices": available_loras_list},"refresh_checkpoint_Z")
                         RMADA_lora_2_weight = gr.Slider(minimum=-5, maximum=5, step=0.1, label="Weight", value=self.config.get('RMADA_lora_2_weight', 0))
+                        RMADA_lora_2_text = gr.Textbox(label="Trigger",value=self.config.get('RMADA_lora_2_text', ""))
                     with gr.Row():
-                        RMADA_lora_3_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_3_check', self.config.get('RMADA_lora_3_check', True)))
-                        RMADA_lora_3 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 1",interactive=True, value=self.config.get('RMADA_lora_3', 'None'))
+                        RMADA_lora_3_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_3_check', self.config.get('RMADA_lora_3_check', False)))
+                        RMADA_lora_3 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 3",interactive=True, value=self.config.get('RMADA_lora_3', 'RMSDXL_Darkness_Cinema'))
                         create_refresh_button(RMADA_lora_3, lora.list_available_loras, lambda: {"choices": available_loras_list},"refresh_checkpoint_Z")
                         RMADA_lora_3_weight = gr.Slider(minimum=-5, maximum=5, step=0.1, label="Weight", value=self.config.get('RMADA_lora_3_weight', 0))
+                        RMADA_lora_3_text = gr.Textbox(label="Trigger",value=self.config.get('RMADA_lora_3_text', "darkness cinema"))
                     with gr.Row():
-                        RMADA_lora_4_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_4_check', self.config.get('RMADA_lora_4_check', True)))
-                        RMADA_lora_4 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 1",interactive=True, value=self.config.get('RMADA_lora_4', 'None'))
+                        RMADA_lora_4_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_4_check', self.config.get('RMADA_lora_4_check', False)))
+                        RMADA_lora_4 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 4",interactive=True, value=self.config.get('RMADA_lora_4', 'RMSDXL_Photo'))
                         create_refresh_button(RMADA_lora_4, lora.list_available_loras, lambda: {"choices": available_loras_list},"refresh_checkpoint_Z")
                         RMADA_lora_4_weight = gr.Slider(minimum=-5, maximum=5, step=0.1, label="Weight", value=self.config.get('RMADA_lora_4_weight', 0))
+                        RMADA_lora_4_text = gr.Textbox(label="Trigger",value=self.config.get('RMADA_lora_4_text', "photo realistic"))
                     with gr.Row():
-                        RMADA_lora_5_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_5_check', self.config.get('RMADA_lora_5_check', True)))
-                        RMADA_lora_5 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 1",interactive=True, value=self.config.get('RMADA_lora_5', 'None'))
+                        RMADA_lora_5_check = gr.Checkbox(label='Enable', value=self.config.get('RMADA_lora_5_check', self.config.get('RMADA_lora_5_check', False)))
+                        RMADA_lora_5 = gr.Dropdown(choices=available_loras_list,elem_id="model_converter_model_name",label="LoRA 5",interactive=True, value=self.config.get('RMADA_lora_5', 'None'))
                         create_refresh_button(RMADA_lora_5, lora.list_available_loras, lambda: {"choices": available_loras_list},"refresh_checkpoint_Z")
                         RMADA_lora_5_weight = gr.Slider(minimum=-5, maximum=5, step=0.1, label="Weight", value=self.config.get('RMADA_lora_5_weight', 0))
+                        RMADA_lora_5_text = gr.Textbox(label="Trigger",value=self.config.get('RMADA_lora_5_text', ""))
 
             with gr.Tab("Settings"):
                 with gr.Row():
@@ -199,7 +204,7 @@ class RmadaUPS(scripts.Script):
 
             #smd_loadkeys_l.click(fn=loadkeys,inputs=[smd_lora_1,components.dtrue],outputs=[keys])
 
-        ui = [RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight]
+        ui = [RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_1_text, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_2_text, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_3_text, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_4_text, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight, RMADA_lora_5_text]
         for elem in ui:
             setattr(elem, "do_not_save_to_config", True)
 
@@ -233,18 +238,23 @@ class RmadaUPS(scripts.Script):
             'RMADA_lora_1_check': RMADA_lora_1_check,
             'RMADA_lora_1': RMADA_lora_1,
             'RMADA_lora_1_weight': RMADA_lora_1_weight,
+            'RMADA_lora_1_text': RMADA_lora_1_text,
             'RMADA_lora_2_check': RMADA_lora_2_check,
             'RMADA_lora_2': RMADA_lora_2,
             'RMADA_lora_2_weight': RMADA_lora_2_weight,
+            'RMADA_lora_2_text': RMADA_lora_2_text,
             'RMADA_lora_3_check': RMADA_lora_3_check,
             'RMADA_lora_3': RMADA_lora_3,
             'RMADA_lora_3_weight': RMADA_lora_3_weight,
+            'RMADA_lora_3_text': RMADA_lora_3_text,
             'RMADA_lora_4_check': RMADA_lora_4_check,
             'RMADA_lora_4': RMADA_lora_4,
             'RMADA_lora_4_weight': RMADA_lora_4_weight,
+            'RMADA_lora_4_text': RMADA_lora_4_text,
             'RMADA_lora_5_check': RMADA_lora_5_check,
             'RMADA_lora_5': RMADA_lora_5,
-            'RMADA_lora_5_weight': RMADA_lora_5_weight
+            'RMADA_lora_5_weight': RMADA_lora_5_weight,
+            'RMADA_lora_5_text': RMADA_lora_5_text
         }
         for k, element in parameters.items():
            self.infotext_fields.append((element, k))
@@ -421,11 +431,11 @@ class RmadaUPS(scripts.Script):
         
         return res
     
-    def addLora(self,texto,lora,weight):
+    def addLora(self,texto,lora,weight,trigger):
         # p.all_prompts = self.addLora(p.all_prompts,'RMSDXL_Enhance',RMADA_lora_enhance)
         res = []
         for text in texto:
-            texto_final = text + '' + "<lora:" + lora + ":" + str(weight) + ">"
+            texto_final = text + '' + " <lora:" + lora + ":" + str(weight) + "> "+trigger
             #print('texto_final: ' + texto_final)
             res.append(texto_final)
         
@@ -451,7 +461,7 @@ class RmadaUPS(scripts.Script):
         return res, res_comentarios_concatenados
 
 
-    def process(self, p, RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight):
+    def process(self, p, RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_1_text, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_2_text, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_3_text, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_4_text, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight, RMADA_lora_5_text):
         self.config = DictConfig({name: var for name, var in locals().items() if name not in ['self', 'p']})
         self.step_limit = 0
 
@@ -497,29 +507,29 @@ class RmadaUPS(scripts.Script):
             if original_prompt_negative != p.all_negative_prompts[0]:
                 p.extra_generation_params["RMADA_Translate_Original_Negative"] = original_prompt_negative
 
-        if RMADA_fixprompt:
-            p.all_prompts = self.fixPrompt(p.all_prompts)
-        
-        #print('RMADA_lora_enhance: ' + RMADA_lora_enhance)
-
 
         if RMADA_loras:           
             if RMADA_lora_1_check:
                 if 'None' not in RMADA_lora_1:
-                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_1,RMADA_lora_1_weight)
+                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_1,RMADA_lora_1_weight,RMADA_lora_1_text)
             if RMADA_lora_2_check:
                 if 'None' not in RMADA_lora_2:
-                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_2,RMADA_lora_2_weight)
+                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_2,RMADA_lora_2_weight,RMADA_lora_2_text)
             if RMADA_lora_3_check:
                 if 'None' not in RMADA_lora_3:
-                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_3,RMADA_lora_3_weight)
+                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_3,RMADA_lora_3_weight,RMADA_lora_3_text)
             if RMADA_lora_4_check:
                 if 'None' not in RMADA_lora_4:
-                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_4,RMADA_lora_4_weight)
+                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_4,RMADA_lora_4_weight,RMADA_lora_4_text)
             if RMADA_lora_5_check:
                 if 'None' not in RMADA_lora_5:
-                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_5,RMADA_lora_5_weight)
+                    p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_5,RMADA_lora_5_weight,RMADA_lora_5_text)
+
+        if RMADA_fixprompt:
+            p.all_prompts = self.fixPrompt(p.all_prompts)
         
+        #print('RMADA_lora_enhance: ' + RMADA_lora_enhance)
+       
             
         self.only_one_pass = True
         self.d1 = 4
@@ -527,7 +537,7 @@ class RmadaUPS(scripts.Script):
         self.s1 = 0.3
         self.s2 = 0.3
         self.scaler = 'bicubic'
-        self.downscale = 0.65
+        self.downscale = 0.7
         self.upscale = 2
         self.smooth_scaling = True
         self.early_out = False
@@ -596,23 +606,28 @@ class RmadaUPS(scripts.Script):
             'RMADA_lora_1_check': RMADA_lora_1_check,
             'RMADA_lora_1': RMADA_lora_1,
             'RMADA_lora_1_weight': RMADA_lora_1_weight,
+            'RMADA_lora_1_text': RMADA_lora_1_text,
             'RMADA_lora_2_check': RMADA_lora_2_check,
             'RMADA_lora_2': RMADA_lora_2,
             'RMADA_lora_2_weight': RMADA_lora_2_weight,
+            'RMADA_lora_2_text': RMADA_lora_2_text,
             'RMADA_lora_3_check': RMADA_lora_3_check,
             'RMADA_lora_3': RMADA_lora_3,
             'RMADA_lora_3_weight': RMADA_lora_3_weight,
+            'RMADA_lora_3_text': RMADA_lora_3_text,
             'RMADA_lora_4_check': RMADA_lora_4_check,
             'RMADA_lora_4': RMADA_lora_4,
             'RMADA_lora_4_weight': RMADA_lora_4_weight,
+            'RMADA_lora_4_text': RMADA_lora_4_text,
             'RMADA_lora_5_check': RMADA_lora_5_check,
             'RMADA_lora_5': RMADA_lora_5,
-            'RMADA_lora_5_weight': RMADA_lora_5_weight
+            'RMADA_lora_5_weight': RMADA_lora_5_weight,
+            'RMADA_lora_5_text': RMADA_lora_5_text
         }
 
 
         for k, v in parameters.items():
-            if v != 0 and 'RMADA_lora_1_check' not in k and 'RMADA_lora_2_check' not in k and 'RMADA_lora_3_check' not in k and 'RMADA_lora_4_check' not in k and 'RMADA_lora_5_check' and 'RMADA_lora_1' not in k and 'RMADA_lora_2' not in k and 'RMADA_lora_3' not in k and 'RMADA_lora_4' not in k and 'RMADA_lora_5' not in k and 'RMADA_lora_1_weight' not in k and 'RMADA_lora_2_weight' not in k and 'RMADA_lora_3_weight' not in k and 'RMADA_lora_4_weight' not in k and 'RMADA_lora_5_weight' not in k and 'RMADA_fixhr' not in k and 'RMADA_enable' not in k and 'RMADA_SaveBefore' not in k and 'RMADA_CheckSharpen' not in k and 'RMADA_CheckEnhance' not in k and 'RMADA_CheckFilters' not in k and 'RMADA_CheckCopyright' not in k and 'RMADA_translate_lang' not in k and 'RMADA_translate' not in k and 'RMADA_removeloras' not in k and 'RMADA_removeemphasis' not in k and 'RMADA_fixprompt' not in k and 'RMADA_moveloras' not in k and 'RMADA_copyright' not in k and 'RMADA_loras' not in k:
+            if v != 0 and 'RMADA_lora_1_text' not in k and 'RMADA_lora_2_text' not in k and 'RMADA_lora_3_text' not in k and 'RMADA_lora_4_text' not in k and 'RMADA_lora_5_text' not in k and 'RMADA_lora_1_check' not in k and 'RMADA_lora_2_check' not in k and 'RMADA_lora_3_check' not in k and 'RMADA_lora_4_check' not in k and 'RMADA_lora_5_check' and 'RMADA_lora_1' not in k and 'RMADA_lora_2' not in k and 'RMADA_lora_3' not in k and 'RMADA_lora_4' not in k and 'RMADA_lora_5' not in k and 'RMADA_lora_1_weight' not in k and 'RMADA_lora_2_weight' not in k and 'RMADA_lora_3_weight' not in k and 'RMADA_lora_4_weight' not in k and 'RMADA_lora_5_weight' not in k and 'RMADA_fixhr' not in k and 'RMADA_enable' not in k and 'RMADA_SaveBefore' not in k and 'RMADA_CheckSharpen' not in k and 'RMADA_CheckEnhance' not in k and 'RMADA_CheckFilters' not in k and 'RMADA_CheckCopyright' not in k and 'RMADA_translate_lang' not in k and 'RMADA_translate' not in k and 'RMADA_removeloras' not in k and 'RMADA_removeemphasis' not in k and 'RMADA_fixprompt' not in k and 'RMADA_moveloras' not in k and 'RMADA_copyright' not in k and 'RMADA_loras' not in k:
                 p.extra_generation_params[k] = v
 
     @staticmethod

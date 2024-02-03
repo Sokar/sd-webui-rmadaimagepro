@@ -26,17 +26,22 @@ RMADA_CheckFilters: true
 RMADA_CheckCopyright: true
 RMADA_SaveBefore: false
 RMADA_lora_1_check: false
-RMADA_lora_1: RMSDXL_Darkness_Cinema
-RMADA_lora_1_weight: 1
+RMADA_lora_1: RMSDXL_Enhance
+RMADA_lora_1_weight: 0
+RMADA_lora_1_text: ''
 RMADA_lora_2_check: false
-RMADA_lora_2: RMSDXL_Enhance
-RMADA_lora_2_weight: 1
+RMADA_lora_2: RMSDXL_Creative
+RMADA_lora_2_weight: 0
+RMADA_lora_2_text: ''
 RMADA_lora_3_check: false
-RMADA_lora_3: RMSDXL_Creative
-RMADA_lora_3_weight: 1
+RMADA_lora_3: RMSDXL_Darkness_Cinema
+RMADA_lora_3_weight: 0
+RMADA_lora_3_text: darkness cinema
 RMADA_lora_4_check: false
 RMADA_lora_4: RMSDXL_Photo
-RMADA_lora_4_weight: 1
+RMADA_lora_4_weight: 0
+RMADA_lora_4_text: photo realistic
 RMADA_lora_5_check: false
 RMADA_lora_5: None
 RMADA_lora_5_weight: 0
+RMADA_lora_5_text: ''
