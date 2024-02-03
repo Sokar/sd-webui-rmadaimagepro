@@ -12,19 +12,21 @@ RMADA_contrast: 0.22
 RMADA_brightness: -0.18
 RMADA_saturation: 0.05
 RMADA_gamma: 1.2
-RMADA_noise: 0.03
+RMADA_noise: 0.015
 RMADA_vignette: 0.05
 RMADA_translate: true
+RMADA_fixhr: true
 RMADA_translate_lang: es
 RMADA_translate_mode: Full translate
-RMADA_removeloras: false
+RMADA_removeloras: true
+RMADA_removeemphasis: true
 RMADA_fixprompt: true
 RMADA_moveloras: true
 RMADA_copyright: 'MODEL: {CHECKPOINT} | SAMPLER: {SAMPLER} | STEPS: {STEPS} | CFG
   Scale: {CFG} | WIDTH: {WIDTH} | HEIGHT: {HEIGHT}     -       @RMADA''24'
-RMADA_loras: true
+RMADA_loras: false
 RMADA_lora_enhance: 0
 RMADA_lora_creative: 0
 RMADA_lora_photo: 0
-RMADA_lora_darkness: 0
+RMADA_lora_darkness: 1
 RMADA_lora_details: 0

@@ -419,9 +419,10 @@ class RmadaUPS(scripts.Script):
         original_prompt = p.all_prompts[0]
         original_prompt_negative = p.all_negative_prompts[0]
 
-        if RMADA_fixprompt:
-            p.all_prompts = self.fixPrompt(p.all_prompts)
-        
+        if RMADA_moveloras:
+            p.all_prompts = self.mover_etiquetas_lora(p.all_prompts)
+
+
         
         if RMADA_translate:
 
@@ -441,9 +442,9 @@ class RmadaUPS(scripts.Script):
             if original_prompt_negative != p.all_negative_prompts[0]:
                 p.extra_generation_params["RMADA_Translate_Original_Negative"] = original_prompt_negative
 
-        if RMADA_moveloras:
-            p.all_prompts = self.mover_etiquetas_lora(p.all_prompts)
-
+        if RMADA_fixprompt:
+            p.all_prompts = self.fixPrompt(p.all_prompts)
+        
         #print('RMADA_lora_enhance: ' + RMADA_lora_enhance)
 
         if RMADA_loras:
