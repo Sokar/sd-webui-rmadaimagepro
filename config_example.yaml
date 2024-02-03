@@ -1,14 +1,30 @@
 RMADA_enable: true
+RMADA_SaveBefore: false
+RMADA_CheckSharpen: true
+RMADA_CheckEnhance: true
+RMADA_CheckFilters: true
+RMADA_CheckCopyright: true
 RMADA_sharpenweight: 0
-RMADA_edge_detection_sharpening: 3.8
-RMADA_wavelet_sharpening: 0
-RMADA_adaptive_sharpened: 0
-RMADA_contrast: 0.05
-RMADA_brightness: 0.05
-RMADA_saturation: 0.1
-RMADA_noise: 0
-RMADA_vignette: 0.07
-RMADA_vignette_overlay: 0
+RMADA_edge_detection_sharpening: 3
+RMADA_wavelet_sharpening: 1
+RMADA_adaptive_sharpened: 0.3
+RMADA_contrast: 0.22
+RMADA_brightness: -0.18
+RMADA_saturation: 0.05
+RMADA_gamma: 1.2
+RMADA_noise: 0.03
+RMADA_vignette: 0.05
 RMADA_translate: true
 RMADA_translate_lang: es
+RMADA_translate_mode: Full translate
 RMADA_removeloras: false
+RMADA_fixprompt: true
+RMADA_moveloras: true
+RMADA_copyright: 'MODEL: {CHECKPOINT} | SAMPLER: {SAMPLER} | STEPS: {STEPS} | CFG
+  Scale: {CFG} | WIDTH: {WIDTH} | HEIGHT: {HEIGHT}     -       @RMADA''24'
+RMADA_loras: true
+RMADA_lora_enhance: 0
+RMADA_lora_creative: 0
+RMADA_lora_photo: 0
+RMADA_lora_darkness: 0
+RMADA_lora_details: 0

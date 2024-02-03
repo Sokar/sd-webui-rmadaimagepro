@@ -1,1 +1,1 @@
-# rMadaImagePro for Auto1111 webui
+# rMadaUPS for Auto1111 webui

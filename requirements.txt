@@ -4,3 +4,6 @@ omegaconf
 numpy
 langdetect
 transformers
+translate
+torchvision
+pywt
