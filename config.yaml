@@ -1,14 +1,1 @@
-RMADA_enable: true
-RMADA_sharpenweight: 0
-RMADA_edge_detection_sharpening: 3.8
-RMADA_wavelet_sharpening: 0
-RMADA_adaptive_sharpened: 0
-RMADA_contrast: 0.05
-RMADA_brightness: 0.05
-RMADA_saturation: 0.1
-RMADA_noise: 0
-RMADA_vignette: 0.07
-RMADA_vignette_overlay: 0
-RMADA_translate: true
-RMADA_translate_lang: es
-RMADA_removeloras: false
+
