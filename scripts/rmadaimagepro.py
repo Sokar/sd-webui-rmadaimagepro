@@ -435,7 +435,7 @@ class RmadaUPS(scripts.Script):
         # p.all_prompts = self.addLora(p.all_prompts,'RMSDXL_Enhance',RMADA_lora_enhance)
         res = []
         for text in texto:
-            texto_final = text + '' + " <lora:" + lora + ":" + str(weight) + "> "+trigger
+            texto_final = text + '' + " <lora:" + lora + ":" + str(weight) + ">,"+trigger
             #print('texto_final: ' + texto_final)
             res.append(texto_final)
         
@@ -484,10 +484,6 @@ class RmadaUPS(scripts.Script):
         original_prompt = p.all_prompts[0]
         original_prompt_negative = p.all_negative_prompts[0]
 
-        if RMADA_moveloras:
-            p.all_prompts = self.mover_etiquetas_lora(p.all_prompts)
-
-
         
         if RMADA_translate:
 
@@ -524,6 +520,9 @@ class RmadaUPS(scripts.Script):
             if RMADA_lora_5_check:
                 if 'None' not in RMADA_lora_5:
                     p.all_prompts = self.addLora(p.all_prompts,RMADA_lora_5,RMADA_lora_5_weight,RMADA_lora_5_text)
+
+        if RMADA_moveloras:
+            p.all_prompts = self.mover_etiquetas_lora(p.all_prompts)
 
         if RMADA_fixprompt:
             p.all_prompts = self.fixPrompt(p.all_prompts)
