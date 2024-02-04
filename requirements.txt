@@ -8,3 +8,4 @@ translate
 torchvision
 pywt
 pandas
+clip_interrogator
