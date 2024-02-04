@@ -7,3 +7,4 @@ transformers
 translate
 torchvision
 pywt
+pandas
