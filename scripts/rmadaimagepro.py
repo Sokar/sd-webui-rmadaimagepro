@@ -3,10 +3,12 @@ import os
 from copy import copy
 from string import Template
 from omegaconf import DictConfig, OmegaConf
-from modules import paths, scripts, sd_models, script_callbacks, shared, images, scripts_postprocessing
+from modules import paths, scripts, sd_models, script_callbacks, shared, images, scripts_postprocessing, devices, lowvram
 from modules.sd_models import checkpoints_loaded, load_model,unload_model_weights
 from modules.ui import create_output_panel, create_refresh_button
+import modules.generation_parameters_copypaste as parameters_copypaste
 from typing import TYPE_CHECKING, Any, NamedTuple
+from clip_interrogator import Config, Interrogator
 import pywt
 import random
 from PIL import Image, ImageFilter, ImageChops, ImageEnhance, ImageDraw, ImageFont
@@ -34,6 +36,9 @@ import pandas as pd
 current_model = None
 tokenizer = None
 model = None
+
+ci = None
+low_vram = False
 
 #model_name = "Helsinki-NLP/opus-mt-es-en"
 #tokenizer = MarianTokenizer.from_pretrained(model_name)
@@ -124,6 +129,62 @@ class RmadaUPS(scripts.Script):
         return descripcion['positive'], descripcion['negative']
 
 
+    def load_clip(self, clip_model_name):
+        global ci, low_vram
+        if ci is None:
+            config = Config(
+                device=devices.get_optimal_device(),
+                cache_path = 'models/clip-interrogator',
+                clip_model_name=clip_model_name,
+            )
+            if low_vram:
+                config.apply_low_vram_defaults()
+            ci = Interrogator(config)
+
+        if clip_model_name != ci.config.clip_model_name:
+            ci.config.clip_model_name = clip_model_name
+            ci.load_clip_model()
+
+    def interrogate(self, image, mode, caption=None):
+        if mode == 'best':
+            prompt = ci.interrogate(image, caption=caption)
+        elif mode == 'caption':
+            prompt = ci.generate_caption(image) if caption is None else caption
+        elif mode == 'classic':
+            prompt = ci.interrogate_classic(image, caption=caption)
+        elif mode == 'fast':
+            prompt = ci.interrogate_fast(image, caption=caption)
+        elif mode == 'negative':
+            prompt = ci.interrogate_negative(image)
+        else:
+            raise Exception(f"Unknown mode {mode}")
+        return prompt
+
+
+    def image_to_prompt(self, image):
+        
+        shared.state.begin()
+        shared.state.job = 'interrogate'
+
+        try:
+            if shared.cmd_opts.lowvram or shared.cmd_opts.medvram:
+                lowvram.send_everything_to_cpu()
+                devices.torch_gc()
+
+            self.load_clip('ViT-H-14/laion2b_s32b_b79k')
+            image = image.convert('RGB')
+            prompt = self.interrogate(image, 'fast')
+        except torch.cuda.OutOfMemoryError as e:
+            prompt = "Ran out of VRAM"
+            print(e)
+        except RuntimeError as e:
+            prompt = f"Exception {type(e)}"
+            print(e)
+
+        shared.state.end()
+        return prompt
+
+
     def ui(self, is_img2img):
 
         with gr.Accordion(label='rMada ProImage', open=False):
@@ -152,7 +213,7 @@ class RmadaUPS(scripts.Script):
                 with gr.Row():
                     with gr.Group():
                         # RMADA_csv_styles = gr.CheckboxGroup(nombres, label="Style", value=self.config.get('RMADA_csv_styles', 'None'))
-                        RMADA_csv_styles = gr.Radio(self.crear_radio_buttons('styles.csv'), label="Style", value=self.config.get('RMADA_csv_styles', 'None'))
+                        RMADA_csv_styles = gr.Radio(self.crear_radio_buttons('styles.csv'), label="Clasic Styles", value=self.config.get('RMADA_csv_styles', 'None'))
             with gr.Tab("Sharpen"):
                 with gr.Row():
                     RMADA_sharpenweight = gr.Slider(minimum=0, maximum=10, step=0.01, label="Sharpen", value=self.config.get('RMADA_sharpenweight', 0))
@@ -211,6 +272,19 @@ class RmadaUPS(scripts.Script):
                         RMADA_lora_5_weight = gr.Slider(minimum=-5, maximum=5, step=0.1, label="Weight", value=self.config.get('RMADA_lora_5_weight', 0))
                         RMADA_lora_5_text = gr.Textbox(label="Trigger",value=self.config.get('RMADA_lora_5_text', ""))
 
+
+            with gr.Tab("Interrogate"):
+                with gr.Column():
+                    with gr.Row():
+                        interrogate_image = gr.Image(type='pil', label="Image")
+                    interrogate_prompt = gr.Textbox(label="Prompt", lines=3)
+                with gr.Row():
+                    interrogate_button = gr.Button("Generate", variant='primary')
+                    interrogate_button.click(self.image_to_prompt, inputs=[interrogate_image], outputs=interrogate_prompt)
+                with gr.Row():
+                    interrogate_copypaste = parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
+
+
             with gr.Tab("Settings"):
                 with gr.Row():
                     RMADA_translate_lang = gr.Dropdown(['es','zh','hi','ar','pt','bn','ru','ja','pa','de','jv','ko','fr','tr','vi','te','mr','it'], label='Lang From', 
@@ -222,6 +296,7 @@ class RmadaUPS(scripts.Script):
                             label="Text/Copyright",
                             value=self.config.get('RMADA_copyright', "MODEL: {CHECKPOINT} | SAMPLER: {SAMPLER} | STEPS: {STEPS} | CFG Scale: {CFG} | WIDTH: {WIDTH} | HEIGHT: {HEIGHT}     -       @RMADA'24")
                         )
+
             with gr.Tab("Help"):
                 with gr.Accordion("Prompts",open=False):
                     gr.HTML(self.get_html_rada('prompts'))
@@ -232,7 +307,14 @@ class RmadaUPS(scripts.Script):
                 with gr.Accordion("Loras",open=False):
                     gr.HTML(self.get_html_rada('loras'))
 
-            #smd_loadkeys_l.click(fn=loadkeys,inputs=[smd_lora_1,components.dtrue],outputs=[keys])
+        try:
+            parameters_copypaste.bind_buttons(interrogate_copypaste,interrogate_image,interrogate_prompt)
+        except:
+            pass
+
+
+
+        #smd_loadkeys_l.click(fn=loadkeys,inputs=[smd_lora_1,components.dtrue],outputs=[keys])
 
         ui = [RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_1_text, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_2_text, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_3_text, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_4_text, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight, RMADA_lora_5_text, RMADA_csv_styles, RMADA_styles]
         for elem in ui:
