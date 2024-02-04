@@ -28,6 +28,7 @@ from modules.processing import (
 from transformers import MarianMTModel, MarianTokenizer
 import re
 import lora
+import pandas as pd
 
 # Variables globales para mantener el modelo y el tokenizador actuales
 current_model = None
@@ -100,15 +101,39 @@ class RmadaUPS(scripts.Script):
     # print(sd_models.che3ckpoint_tiles())
     # Loras disponibles
     # print(list(lora.available_loras.keys()))
+    
+    
+    # Función que crea los radiobuttons con los nombres
+    def crear_radio_buttons(self, archivo_csv):
+        archivo_csv = Path(__file__).parent.parent.resolve() / 'csv' / archivo_csv
+        #archivo_csv = '../csv/styles.csv' # Asegúrate de tener tu archivo CSV en el mismo directorio que este script o proporciona la ruta completa
+        df = pd.read_csv(archivo_csv, quotechar='"', skipinitialspace=True)
+        nombres = df['nombre'].tolist()
+        nombres.insert(0, "None")
+       
+        return nombres
+
+    def csv_estilos_desc(self,archivo_csv, nombre):
+        archivo_csv = Path(__file__).parent.parent.resolve() / 'csv' / archivo_csv
+        #archivo_csv = '../csv/styles.csv' # Asegúrate de tener tu archivo CSV en el mismo directorio que este script o proporciona la ruta completa
+        df = pd.read_csv(archivo_csv, quotechar='"', skipinitialspace=True)
+
+        # Filtrar el DataFrame para obtener los campos positive y negative asociados al nombre
+        descripcion = df[df['nombre'] == nombre][['positive', 'negative']].iloc[0]
+        
+        return descripcion['positive'], descripcion['negative']
+
 
     def ui(self, is_img2img):
 
         with gr.Accordion(label='rMada ProImage', open=False):
             with gr.Row():
                 RMADA_enable = gr.Checkbox(label='Enable extension', value=self.config.get('RMADA_enable', False))
+
             with gr.Tab("General"):
                 with gr.Row():
                     with gr.Group():
+                        RMADA_styles = gr.Checkbox(label='Enable Styles', value=self.config.get('RMADA_styles', True))
                         RMADA_loras = gr.Checkbox(label='Enable Loras', value=self.config.get('RMADA_loras', True))
                         RMADA_CheckSharpen = gr.Checkbox(label='Enable Sharpen', value=self.config.get('RMADA_CheckSharpen', True))
                         RMADA_CheckEnhance = gr.Checkbox(label='Enable Enhance', value=self.config.get('RMADA_CheckEnhance', True))
@@ -123,6 +148,10 @@ class RmadaUPS(scripts.Script):
                         RMADA_fixhr = gr.Checkbox(label='Auto Hires Fix', value=self.config.get('RMADA_fixhr', True))
                         RMADA_translate = gr.Checkbox(label='Auto Translate', value=self.config.get('RMADA_translate', False))
                         RMADA_SaveBefore = gr.Checkbox(label='Save Image Before PostPro', value=self.config.get('RMADA_SaveBefore', False))
+            with gr.Tab("Styles"):
+                with gr.Row():
+                    # RMADA_csv_styles = gr.CheckboxGroup(nombres, label="Style", value=self.config.get('RMADA_csv_styles', 'None'))
+                    RMADA_csv_styles = gr.Radio(self.crear_radio_buttons('styles.csv'), label="Style", value=self.config.get('RMADA_csv_styles', 'None'))
             with gr.Tab("Sharpen"):
                 with gr.Row():
                     RMADA_sharpenweight = gr.Slider(minimum=0, maximum=10, step=0.01, label="Sharpen", value=self.config.get('RMADA_sharpenweight', 0))
@@ -204,7 +233,7 @@ class RmadaUPS(scripts.Script):
 
             #smd_loadkeys_l.click(fn=loadkeys,inputs=[smd_lora_1,components.dtrue],outputs=[keys])
 
-        ui = [RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_1_text, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_2_text, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_3_text, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_4_text, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight, RMADA_lora_5_text]
+        ui = [RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_1_text, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_2_text, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_3_text, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_4_text, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight, RMADA_lora_5_text, RMADA_csv_styles, RMADA_styles]
         for elem in ui:
             setattr(elem, "do_not_save_to_config", True)
 
@@ -254,7 +283,9 @@ class RmadaUPS(scripts.Script):
             'RMADA_lora_5_check': RMADA_lora_5_check,
             'RMADA_lora_5': RMADA_lora_5,
             'RMADA_lora_5_weight': RMADA_lora_5_weight,
-            'RMADA_lora_5_text': RMADA_lora_5_text
+            'RMADA_lora_5_text': RMADA_lora_5_text,
+            'RMADA_csv_styles': RMADA_csv_styles,
+            'RMADA_styles': RMADA_styles
         }
         for k, element in parameters.items():
            self.infotext_fields.append((element, k))
@@ -459,19 +490,40 @@ class RmadaUPS(scripts.Script):
             res_comentarios_concatenados.append(comentarios_concatenados)
 
         return res, res_comentarios_concatenados
+    
+    def apply_styles(self, texto, style):
+        res = []
+        for text in texto:
+            
+            # Verifica si '{respuesta}' está en el texto
+            if '{prompt}' in text:
+                # Reemplaza '{respuesta}' con el valor de estilo
+                devuelta = text.replace('{prompt}', style)
+                res.append(devuelta)
+            else:
+                # Devuelve el estilo seguido de una coma y el texto original
+                devuelta = f"{style}, {text}"
+                res.append(devuelta)
 
+        return res
 
-    def process(self, p, RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_1_text, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_2_text, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_3_text, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_4_text, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight, RMADA_lora_5_text):
+    def process(self, p, RMADA_enable, RMADA_sharpenweight, RMADA_edge_detection_sharpening, RMADA_wavelet_sharpening, RMADA_adaptive_sharpened, RMADA_contrast, RMADA_brightness, RMADA_saturation, RMADA_gamma, RMADA_noise, RMADA_vignette, RMADA_translate, RMADA_translate_lang, RMADA_translate_mode, RMADA_fixhr, RMADA_removeloras, RMADA_removeemphasis, RMADA_fixprompt, RMADA_moveloras, RMADA_copyright, RMADA_loras, RMADA_CheckSharpen, RMADA_CheckEnhance, RMADA_CheckFilters, RMADA_CheckCopyright, RMADA_SaveBefore, RMADA_lora_1_check, RMADA_lora_1, RMADA_lora_1_weight, RMADA_lora_1_text, RMADA_lora_2_check, RMADA_lora_2, RMADA_lora_2_weight, RMADA_lora_2_text, RMADA_lora_3_check, RMADA_lora_3, RMADA_lora_3_weight, RMADA_lora_3_text, RMADA_lora_4_check, RMADA_lora_4, RMADA_lora_4_weight, RMADA_lora_4_text, RMADA_lora_5_check, RMADA_lora_5, RMADA_lora_5_weight, RMADA_lora_5_text, RMADA_csv_styles, RMADA_styles):
         self.config = DictConfig({name: var for name, var in locals().items() if name not in ['self', 'p']})
         self.step_limit = 0
-
-        # print(self.t2i_w)
 
         if not RMADA_enable or self.disable:
             script_callbacks.remove_current_script_callbacks()
             return
         
         model = p.sd_model.model.diffusion_model
+
+        #print(RMADA_csv_styles)
+        #print( self.csv_estilos_desc('styles.csv',RMADA_csv_styles))
+        
+        if RMADA_styles:
+            if 'None' not in RMADA_csv_styles:
+                style = self.csv_estilos_desc('styles.csv',RMADA_csv_styles)
+                p.all_prompts = self.apply_styles(p.all_prompts,style[0])
         
         p.all_prompts, res_comentarios_concatenados = self.extraer_y_concatenar_comentarios(p.all_prompts)
 
@@ -621,7 +673,9 @@ class RmadaUPS(scripts.Script):
             'RMADA_lora_5_check': RMADA_lora_5_check,
             'RMADA_lora_5': RMADA_lora_5,
             'RMADA_lora_5_weight': RMADA_lora_5_weight,
-            'RMADA_lora_5_text': RMADA_lora_5_text
+            'RMADA_lora_5_text': RMADA_lora_5_text,
+            'RMADA_csv_styles': RMADA_csv_styles,
+            'RMADA_styles': RMADA_styles
         }
 
 
