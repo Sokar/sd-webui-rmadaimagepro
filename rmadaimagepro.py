@@ -521,16 +521,18 @@ class RmadaUPS(scripts.Script):
         #print(RMADA_csv_styles)
         #print( self.csv_estilos_desc('styles.csv',RMADA_csv_styles))
         
-        if RMADA_styles:
-            if 'None' not in RMADA_csv_styles:
-                style = self.csv_estilos_desc('styles.csv',RMADA_csv_styles)
-                p.all_prompts = self.apply_styles(p.all_prompts,style[0])
         
         p.all_prompts, res_comentarios_concatenados = self.extraer_y_concatenar_comentarios(p.all_prompts)
 
         if RMADA_removeemphasis:
             p.all_prompts = self.removeEmphasis(p.all_prompts)
 
+
+        if RMADA_styles:
+            if 'None' not in RMADA_csv_styles:
+                style = self.csv_estilos_desc('styles.csv',RMADA_csv_styles)
+                p.all_prompts = self.apply_styles(p.all_prompts,style[0])
+                
         if RMADA_removeloras:
             p.all_prompts = self.removeLoras(p.all_prompts)
         
@@ -681,7 +683,7 @@ class RmadaUPS(scripts.Script):
 
 
         for k, v in parameters.items():
-            if v != 0 and 'RMADA_lora_1_text' not in k and 'RMADA_lora_2_text' not in k and 'RMADA_lora_3_text' not in k and 'RMADA_lora_4_text' not in k and 'RMADA_lora_5_text' not in k and 'RMADA_lora_1_check' not in k and 'RMADA_lora_2_check' not in k and 'RMADA_lora_3_check' not in k and 'RMADA_lora_4_check' not in k and 'RMADA_lora_5_check' and 'RMADA_lora_1' not in k and 'RMADA_lora_2' not in k and 'RMADA_lora_3' not in k and 'RMADA_lora_4' not in k and 'RMADA_lora_5' not in k and 'RMADA_lora_1_weight' not in k and 'RMADA_lora_2_weight' not in k and 'RMADA_lora_3_weight' not in k and 'RMADA_lora_4_weight' not in k and 'RMADA_lora_5_weight' not in k and 'RMADA_fixhr' not in k and 'RMADA_enable' not in k and 'RMADA_SaveBefore' not in k and 'RMADA_CheckSharpen' not in k and 'RMADA_CheckEnhance' not in k and 'RMADA_CheckFilters' not in k and 'RMADA_CheckCopyright' not in k and 'RMADA_translate_lang' not in k and 'RMADA_translate' not in k and 'RMADA_removeloras' not in k and 'RMADA_removeemphasis' not in k and 'RMADA_fixprompt' not in k and 'RMADA_moveloras' not in k and 'RMADA_copyright' not in k and 'RMADA_loras' not in k:
+            if v != 0 and 'RMADA_styles' not in k and 'RMADA_lora_1_text' not in k and 'RMADA_lora_2_text' not in k and 'RMADA_lora_3_text' not in k and 'RMADA_lora_4_text' not in k and 'RMADA_lora_5_text' not in k and 'RMADA_lora_1_check' not in k and 'RMADA_lora_2_check' not in k and 'RMADA_lora_3_check' not in k and 'RMADA_lora_4_check' not in k and 'RMADA_lora_5_check' and 'RMADA_lora_1' not in k and 'RMADA_lora_2' not in k and 'RMADA_lora_3' not in k and 'RMADA_lora_4' not in k and 'RMADA_lora_5' not in k and 'RMADA_lora_1_weight' not in k and 'RMADA_lora_2_weight' not in k and 'RMADA_lora_3_weight' not in k and 'RMADA_lora_4_weight' not in k and 'RMADA_lora_5_weight' not in k and 'RMADA_fixhr' not in k and 'RMADA_enable' not in k and 'RMADA_SaveBefore' not in k and 'RMADA_CheckSharpen' not in k and 'RMADA_CheckEnhance' not in k and 'RMADA_CheckFilters' not in k and 'RMADA_CheckCopyright' not in k and 'RMADA_translate_lang' not in k and 'RMADA_translate' not in k and 'RMADA_removeloras' not in k and 'RMADA_removeemphasis' not in k and 'RMADA_fixprompt' not in k and 'RMADA_moveloras' not in k and 'RMADA_copyright' not in k and 'RMADA_loras' not in k:
                 p.extra_generation_params[k] = v
 
     @staticmethod
