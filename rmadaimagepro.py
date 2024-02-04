@@ -150,8 +150,9 @@ class RmadaUPS(scripts.Script):
                         RMADA_SaveBefore = gr.Checkbox(label='Save Image Before PostPro', value=self.config.get('RMADA_SaveBefore', False))
             with gr.Tab("Styles"):
                 with gr.Row():
-                    # RMADA_csv_styles = gr.CheckboxGroup(nombres, label="Style", value=self.config.get('RMADA_csv_styles', 'None'))
-                    RMADA_csv_styles = gr.Radio(self.crear_radio_buttons('styles.csv'), label="Style", value=self.config.get('RMADA_csv_styles', 'None'))
+                    with gr.Group():
+                        # RMADA_csv_styles = gr.CheckboxGroup(nombres, label="Style", value=self.config.get('RMADA_csv_styles', 'None'))
+                        RMADA_csv_styles = gr.Radio(self.crear_radio_buttons('styles.csv'), label="Style", value=self.config.get('RMADA_csv_styles', 'None'))
             with gr.Tab("Sharpen"):
                 with gr.Row():
                     RMADA_sharpenweight = gr.Slider(minimum=0, maximum=10, step=0.01, label="Sharpen", value=self.config.get('RMADA_sharpenweight', 0))
@@ -498,7 +499,7 @@ class RmadaUPS(scripts.Script):
             # Verifica si '{respuesta}' está en el texto
             if '{prompt}' in style:
                 # Reemplaza '{respuesta}' con el valor de estilo
-                devuelta = text.replace('{prompt}', style)
+                devuelta = style.replace('{prompt}', text)
                 res.append(devuelta)
             else:
                 # Devuelve el estilo seguido de una coma y el texto original
