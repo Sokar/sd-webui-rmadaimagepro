@@ -37,6 +37,10 @@ current_model = None
 tokenizer = None
 model = None
 
+current_model_es = None
+tokenizer_es = None
+model_es = None
+
 ci = None
 low_vram = False
 
@@ -93,6 +97,14 @@ class RmadaUPS(scripts.Script):
         #else:
             # print(f"Model {model_name} is already loaded.")
 
+    def load_model_es(self, model_name):
+        global current_model_es, tokenizer_es, model_es
+        # Verifica si el modelo solicitado ya está cargado
+        if current_model_es != model_name:
+            tokenizer_es = MarianTokenizer.from_pretrained(model_name)
+            model_es = MarianMTModel.from_pretrained(model_name)
+            current_model_es = model_name
+
     def get_html_rada(self, fichero):
         base_dir = Path(__file__).parent.parent / "help"
         file_html = fichero + ".html"
@@ -145,7 +157,10 @@ class RmadaUPS(scripts.Script):
             ci.config.clip_model_name = clip_model_name
             ci.load_clip_model()
 
-    def interrogate(self, image, mode, caption=None):
+    def interrogate(self, image, mode, RMADA_translate_lang, RMADA_translate):
+        
+        caption=None
+
         if mode == 'best':
             prompt = ci.interrogate(image, caption=caption)
         elif mode == 'caption':
@@ -158,10 +173,38 @@ class RmadaUPS(scripts.Script):
             prompt = ci.interrogate_negative(image)
         else:
             raise Exception(f"Unknown mode {mode}")
+
+        #print(setattr(elem))
+        #print(self.config.get('RMADA_Translate', False))
+        #print(prompt)
+
+        if RMADA_translate:
+            # translate inverso
+            self.load_model_es("Helsinki-NLP/opus-mt-en-"+RMADA_translate_lang)
+
+            src_texts = prompt
+            src_texts = src_texts.replace("araffe ", "").replace(" araffe", "").replace("araffe", "").replace("arafed ", "").replace(" arafed", "").replace("arafed", "").replace("!", "")
+
+            tgt_texts = None  # No es necesario para la traducción
+
+            # Preparar los datos para el modelo
+            model_inputs = tokenizer_es(src_texts, return_tensors="pt", truncation=True, padding=True)
+            labels = tokenizer_es(text_target=tgt_texts, return_tensors="pt", truncation=True, padding=True) if tgt_texts else None
+            if labels:
+                model_inputs["labels"] = labels["input_ids"]
+
+            # Traducir
+            translated = model_es.generate(**model_inputs, max_length=512)
+            segmentoParser = tokenizer_es.decode(translated[0], skip_special_tokens=True)
+
+            segmentoParser = segmentoParser.replace("araffe ", "").replace(" araffe", "").replace("araffe", "").replace("arafed ", "").replace(" arafed", "").replace("arafed", "").replace("!", "")
+
+            prompt = segmentoParser
+
         return prompt
 
 
-    def image_to_prompt(self, image):
+    def image_to_prompt(self, image, RMADA_translate_lang, RMADA_translate):
         
         shared.state.begin()
         shared.state.job = 'interrogate'
@@ -171,9 +214,11 @@ class RmadaUPS(scripts.Script):
                 lowvram.send_everything_to_cpu()
                 devices.torch_gc()
 
-            self.load_clip('ViT-H-14/laion2b_s32b_b79k')
+            # ViT-H-14/laion2b_s32b_b79k
+            # ViT-L-14/openai <<< mejor para SDXL
+            self.load_clip('ViT-L-14/openai')
             image = image.convert('RGB')
-            prompt = self.interrogate(image, 'fast')
+            prompt = self.interrogate(image, 'fast', RMADA_translate_lang, RMADA_translate)
         except torch.cuda.OutOfMemoryError as e:
             prompt = "Ran out of VRAM"
             print(e)
@@ -273,18 +318,6 @@ class RmadaUPS(scripts.Script):
                         RMADA_lora_5_text = gr.Textbox(label="Trigger",value=self.config.get('RMADA_lora_5_text', ""))
 
 
-            with gr.Tab("Interrogate"):
-                with gr.Column():
-                    with gr.Row():
-                        interrogate_image = gr.Image(type='pil', label="Image")
-                    interrogate_prompt = gr.Textbox(label="Prompt", lines=3)
-                with gr.Row():
-                    interrogate_button = gr.Button("Generate", variant='primary')
-                    interrogate_button.click(self.image_to_prompt, inputs=[interrogate_image], outputs=interrogate_prompt)
-                with gr.Row():
-                    interrogate_copypaste = parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
-
-
             with gr.Tab("Settings"):
                 with gr.Row():
                     RMADA_translate_lang = gr.Dropdown(['es','zh','hi','ar','pt','bn','ru','ja','pa','de','jv','ko','fr','tr','vi','te','mr','it'], label='Lang From', 
@@ -296,6 +329,18 @@ class RmadaUPS(scripts.Script):
                             label="Text/Copyright",
                             value=self.config.get('RMADA_copyright', "MODEL: {CHECKPOINT} | SAMPLER: {SAMPLER} | STEPS: {STEPS} | CFG Scale: {CFG} | WIDTH: {WIDTH} | HEIGHT: {HEIGHT}     -       @RMADA'24")
                         )
+
+            with gr.Tab("Interrogate"):
+                with gr.Column():
+                    with gr.Row():
+                        interrogate_image = gr.Image(type='pil', label="Image")
+                    interrogate_prompt = gr.Textbox(label="Prompt", lines=3)
+                with gr.Row():
+                    interrogate_button = gr.Button("Generate", variant='primary')
+                    interrogate_button.click(self.image_to_prompt, inputs=[interrogate_image, RMADA_translate_lang, RMADA_translate], outputs=interrogate_prompt)
+                with gr.Row():
+                    interrogate_copypaste = parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
+
 
             with gr.Tab("Help"):
                 with gr.Accordion("Prompts",open=False):
