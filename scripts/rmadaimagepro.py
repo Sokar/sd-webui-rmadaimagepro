@@ -192,6 +192,9 @@ class RmadaUPS(scripts.Script):
                         .replace("”","")\
                         .replace('"',"")
 
+            caracter_reemplazo = "<PIPE>"
+            src_texts = src_texts.replace("|", caracter_reemplazo)
+
             tgt_texts = None  # No es necesario para la traducción
 
             # Preparar los datos para el modelo
@@ -204,7 +207,6 @@ class RmadaUPS(scripts.Script):
             translated = model_es.generate(**model_inputs, max_length=512)
             segmentoParser = tokenizer_es.decode(translated[0], skip_special_tokens=True)
 
-
             # Dividir el texto en elementos y eliminar duplicados manteniendo el orden
             text_elements = segmentoParser.split(', ')
             unique_elements = []
@@ -214,6 +216,8 @@ class RmadaUPS(scripts.Script):
             
             # Reconstruir el texto sin duplicados
             segmentoParser = ', '.join(unique_elements)
+
+            segmentoParser = segmentoParser.replace(caracter_reemplazo, "|")
 
 
             prompt = segmentoParser
@@ -507,6 +511,9 @@ class RmadaUPS(scripts.Script):
                     src_texts = text
                     tgt_texts = None  # No es necesario para la traducción
 
+                    caracter_reemplazo = "<PIPE>"
+                    src_texts = src_texts.replace("|", caracter_reemplazo)
+
                     # Preparar los datos para el modelo
                     model_inputs = tokenizer(src_texts, return_tensors="pt", truncation=True, padding=True)
                     labels = tokenizer(text_target=tgt_texts, return_tensors="pt", truncation=True, padding=True) if tgt_texts else None
@@ -516,6 +523,9 @@ class RmadaUPS(scripts.Script):
                     # Traducir
                     translated = model.generate(**model_inputs, max_length=512)
                     segmentoParser = tokenizer.decode(translated[0], skip_special_tokens=True)
+
+                    segmentoParser = segmentoParser.replace(caracter_reemplazo, "|")
+
                     res.append(''.join(segmentoParser))
                     nuevo_texto = ''.join(segmentoParser)
                     last_text = text
@@ -558,31 +568,6 @@ class RmadaUPS(scripts.Script):
             res.append(text)
             return res
         
-    def removeEmphasisNew(self, texto):
-        res = []
-        for text in texto:
-            # Generar un marcador único utilizando un número aleatorio
-            random_number = random.randint(100000, 999999)
-            unique_marker = f"PROTECTEDPATTERN{random_number}"
-
-            # Proteger los (:0) reemplazándolos temporalmente por el marcador único
-            protected = re.sub(r'\(\:0\)', unique_marker, text)
-
-            protected = protected.replace("(", " (").replace(")", ") ")
-            # Eliminar contenido entre paréntesis excluyendo los marcadores protegidos
-            protected = re.sub(r'\((?!' + re.escape(unique_marker) + r')([^()]*)\)', '', protected)
-
-            # Restaurar los (:0) reemplazando el marcador por el original
-            final_text = re.sub(re.escape(unique_marker), '(:0)', protected)
-
-            # Eliminar espacios extra que podrían haber sido introducidos
-            final_text = re.sub(r'\s{2,}', ' ', final_text).strip()
-
-            # Limpiar posibles espacios alrededor de (:0) que se introdujeron al principio
-            final_text = re.sub(r'\s*\(\:0\)\s*', '(:0)', final_text)
-            
-            res.append(final_text)
-        return res
     
     def removeLoras(self, texto):
         res = []
