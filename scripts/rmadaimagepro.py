@@ -14,7 +14,6 @@ import random
 from PIL import Image, ImageFilter, ImageChops, ImageEnhance, ImageDraw, ImageFont
 from translate import Translator
 from langdetect import detect
-import re
 import numpy as np
 import gradio as gr
 import torch
@@ -183,7 +182,15 @@ class RmadaUPS(scripts.Script):
             self.load_model_es("Helsinki-NLP/opus-mt-en-"+RMADA_translate_lang)
 
             src_texts = prompt
-            src_texts = src_texts.replace("araffe ", "").replace(" araffe", "").replace("araffe", "").replace("arafed ", "").replace(" arafed", "").replace("arafed", "").replace("!", "")
+            src_texts = src_texts.replace("araffe ", "")\
+                        .replace(" araffe", "")\
+                        .replace("araffe", "")\
+                        .replace("arafed ", "")\
+                        .replace(" arafed", "")\
+                        .replace("arafed", "")\
+                        .replace("!", "")\
+                        .replace("”","")\
+                        .replace('"',"")
 
             tgt_texts = None  # No es necesario para la traducción
 
@@ -197,7 +204,17 @@ class RmadaUPS(scripts.Script):
             translated = model_es.generate(**model_inputs, max_length=512)
             segmentoParser = tokenizer_es.decode(translated[0], skip_special_tokens=True)
 
-            segmentoParser = segmentoParser.replace("araffe ", "").replace(" araffe", "").replace("araffe", "").replace("arafed ", "").replace(" arafed", "").replace("arafed", "").replace("!", "")
+
+            # Dividir el texto en elementos y eliminar duplicados manteniendo el orden
+            text_elements = segmentoParser.split(', ')
+            unique_elements = []
+            for element in text_elements:
+                if element not in unique_elements:
+                    unique_elements.append(element)
+            
+            # Reconstruir el texto sin duplicados
+            segmentoParser = ', '.join(unique_elements)
+
 
             prompt = segmentoParser
 
@@ -520,6 +537,13 @@ class RmadaUPS(scripts.Script):
     def removeEmphasis(self, texto):
         res = []
         for text in texto:
+
+            random_number = random.randint(100000, 999999)
+            unique_marker = f"PROTECTEDPATTERN{random_number}"
+
+            # Proteger los (:0) reemplazándolos temporalmente por el marcador único
+            text = re.sub(r'\(\:0\)', unique_marker, text)
+        
             text = text.replace("(", " (").replace(")", ") ")
             # Remove content in multiple parentheses, including the optional ending with :NUMBER, completely removing the :NUMBER part
             text = re.sub(r'\({1,}([^():]*?)(:\d+\.?\d*)?\){1,}', r'\1', text)
@@ -528,8 +552,36 @@ class RmadaUPS(scripts.Script):
             
             # Eliminar espacios extra que podrían haber sido introducidos
             text = re.sub(r'\s{2,}', ' ', text).strip()
+
+            text = re.sub(re.escape(unique_marker), '(:0)', text)
             
             res.append(text)
+            return res
+        
+    def removeEmphasisNew(self, texto):
+        res = []
+        for text in texto:
+            # Generar un marcador único utilizando un número aleatorio
+            random_number = random.randint(100000, 999999)
+            unique_marker = f"PROTECTEDPATTERN{random_number}"
+
+            # Proteger los (:0) reemplazándolos temporalmente por el marcador único
+            protected = re.sub(r'\(\:0\)', unique_marker, text)
+
+            protected = protected.replace("(", " (").replace(")", ") ")
+            # Eliminar contenido entre paréntesis excluyendo los marcadores protegidos
+            protected = re.sub(r'\((?!' + re.escape(unique_marker) + r')([^()]*)\)', '', protected)
+
+            # Restaurar los (:0) reemplazando el marcador por el original
+            final_text = re.sub(re.escape(unique_marker), '(:0)', protected)
+
+            # Eliminar espacios extra que podrían haber sido introducidos
+            final_text = re.sub(r'\s{2,}', ' ', final_text).strip()
+
+            # Limpiar posibles espacios alrededor de (:0) que se introdujeron al principio
+            final_text = re.sub(r'\s*\(\:0\)\s*', '(:0)', final_text)
+            
+            res.append(final_text)
         return res
     
     def removeLoras(self, texto):
@@ -554,11 +606,21 @@ class RmadaUPS(scripts.Script):
             text = re.sub(r',\s*,+', ', ', text)
             # Finalmente, eliminar cualquier coma al final del texto
             text = re.sub(r',\s*$', '', text)
+
+            # # Dividir el texto en elementos y eliminar duplicados manteniendo el orden
+            # text_elements = text.split(', ')
+            # unique_elements = []
+            # for element in text_elements:
+            #     if element not in unique_elements:
+            #         unique_elements.append(element)
+            # 
+            # # Reconstruir el texto sin duplicados
+            # text = ', '.join(unique_elements)
+
             if not text.startswith('+'):
                 text = '+ ' + text
             res.append(text)
         return res
-    
 
     def mover_etiquetas_lora(self,texto):
         res = []
@@ -749,6 +811,7 @@ class RmadaUPS(scripts.Script):
             self.step_limit = params.sampling_step if self.only_one_pass else 0
 
         if RMADA_fixhr and not self.es_tamano_estandar(p.width,p.height):
+            print("rMada ProImage - Applying Hires Fix")
             script_callbacks.on_cfg_denoiser(denoiser_callback)
         else:
             script_callbacks.remove_current_script_callbacks()
